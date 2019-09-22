@@ -8,12 +8,14 @@ import matplotlib.pyplot as plt
 from matplotlib.cbook import get_sample_data
 import random
 import sklearn as skl
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
 # load datasets from sklearn
 from sklearn import datasets
 
 iris=load_iris()
 
-# keys of iris object 
+# keys of iris object
 iris.keys()
 n_samples,n_features = iris.data.shape
 iris.data[0]
@@ -46,7 +48,7 @@ plt.legend(loc="upper left")
 iris_rows=np.where(iris.target==0,iris.target_names[0],
                    np.where(iris.target==1,iris.target_names[1],
                    iris.target_names[2]))
-iris_df = pd.DataFrame(iris.data, columns= iris.feature_names, 
+iris_df = pd.DataFrame(iris.data, columns= iris.feature_names,
                        index=iris_rows)
 pd.plotting.scatter_matrix(iris_df,c=iris.target,figsize=(8,8))
 
@@ -74,7 +76,34 @@ for i in range(16):
     ax=fig.add_subplot(4,4,i+1,xticks=[],yticks=[])
     plt.imshow(faces.images[i],cmap=plt.cm.bone)
 
-    
+x,y=iris.data, iris.target
+# splitting data into train and test data
+train_x, test_x,train_y, test_y = train_test_split(x,y,train_size=0.5,
+                                                   random_state=123,
+                                                   stratify=y)
+# training KNN classifier
+classifier = KNeighborsClassifier().fit(train_x, train_y)
+pred_y = classifier.predict(test_x)
+print("Fraction accuracy")
+print(np.sum(pred_y==test_y)/float(len(test_y)))
+
+pred_y.shape
+test_y.shape
+correct_idx = np.where(pred_y==test_y)
+incorrect_idx = np.where(pred_y!=test_y)
+# plot two dimensions
+for n in np.unique(test_y):
+    # n = 0
+    idx = np.where(test_y == n)
+    plt.scatter(test_x[idx,1],test_x[idx,2],
+                label=iris.target_names[n])
+plt.scatter(test_x[incorrect_idx,1],test_x[incorrect_idx,2],
+            color="darkred",label="incorrect ones")
+plt.xlabel("Sepal width")
+plt.ylabel("petal length")
+plt.legend(loc=3)
+plt.title("iris classification results")
+
 
 
 
