@@ -647,11 +647,27 @@ axes.fill_between("x","y1","y2", color="yellow", data=dataObj)
 axes.plot("x","mean", color="black", data=dataObj)
 
 # Exercise
-y_raw=np.random.randn(1000).cumsum()+15
+''' y_raw=np.random.randn(1000).cumsum()+15
 x_raw=np.linspace(0,24,y_raw.size)
 x_pos=x_raw.reshape(10,100).min(axis=1)
 y_avg = y_raw.reshape(10,100).mean(axis=1)
 y_err=y_raw.reshape(10,100).ptp(axis=1)
+
+bar_width = x_pos[1]-x_pos[0]
+x_pred = np.linspace(0,30) '''
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
