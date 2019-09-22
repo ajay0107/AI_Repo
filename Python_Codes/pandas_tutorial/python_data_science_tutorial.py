@@ -9,6 +9,8 @@ import numpy as np
 import seaborn as sns
 import numba
 import matplotlib.pyplot as plt
+from matplotlib.cbook import get_sample_data
+import random
 #import cv2
 # from sklearn import linear_model
 import sklearn as skl
@@ -653,13 +655,36 @@ x_pos=x_raw.reshape(10,100).min(axis=1)
 y_avg = y_raw.reshape(10,100).mean(axis=1)
 y_err=y_raw.reshape(10,100).ptp(axis=1)
 
+# 2D arrays or images
+data= np.random.randn(225).reshape(15,15)
+fig,ax=plt.subplots()
+im = ax.imshow(data, cmap="gist_earth")
+fig.colorbar(im)
+ 
+data= np.random.randn(225).reshape(15,15)
+fig,ax=plt.subplots()
+im = ax.imshow(data, cmap="seismic")
+fig.colorbar(im)
 
+t= np.arange(0,5,0.2)
+plt.plot(t, t, t, t**2, t, t**3)
+# color specification for plots
+plt.plot(t,t,"red",t,t**2,"green",t,t**3,"blue")
+# markers
+t=np.arange(0,5,0.1)
+plt.plot(t,t,"o",t,t**2,"+",t,t**3,":")
+# combining markers with colors
+plt.plot(t,t,"*y",t,t**2,"8m",t,t**3,"sb")
+# lineStyles
+t=np.arange(0,5,1)
+plt.plot(t,t,":",t,t**2,"-",t,t**3,"-.")
+# Plot attributes
+t=np.arange(0,5,0.2)
+plt.plot(t,t,"y:",t,t**2,"b-",t,t**3,"r-.")
 
-
-
-
-
-
+t =np.arange(0,5,0.1)
+a=np.exp(-t)*np.cos(2*np.pi*t)
+plt.plot(t,a,"r:D",mfc="yellow",mec="green")
 
 
 
