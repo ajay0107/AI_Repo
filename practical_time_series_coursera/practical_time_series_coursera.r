@@ -70,6 +70,48 @@ par(mfrow=c(2,1))
 plot(ma_5, main="moving average order 5", col="red")
 acf(ma_5,main="autocorrelation graph of MA(5)")
 
+# simulating the AR(1) process
+set.seed(2016)
+N <- 1000
+phi <- 0.4
+z <- rnorm(N,0,1)
+x <- vector()
+x[1] <- z[1]
+for (i in 2:N) {
+  x[i] <- z[i]+phi*x[i-1]
+}
+# converting x as ts object
+x <- ts(x)
+par(mfrow=c(2,1))
+plot(x, main="AR(1) process with white noise,phi=0.4")
+x_acf <- acf(x,main="ACF of AR(1) process with white noise,phi=0.4")
+# if phi=1
+set.seed(2016)
+N <- 1000
+phi <- 1
+z <- rnorm(N,0,1)
+x <- vector()
+x[1] <- z[1]
+for (i in 2:N) {
+  x[i] <- z[i]+phi*x[i-1]
+}
+# converting x as ts object
+x <- ts(x)
+par(mfrow=c(2,1))
+plot(x, main="AR(1) process with white noise,phi=1")
+x_acf <- acf(x,main="ACF of AR(1) process with white noise,phi=1")
+
+# simulating AR(2) process xt=zt+phi1*xt-1+phi2*xt-2
+set.seed(2017)
+phi1 <- 0.5
+phi2 <- -0.4
+x <- arima.sim(list(ar=c(phi1,phi2)),n=1000)
+par(mfrow=c(2,1))
+plot(x,main=paste("AR(2) process phi1=",phi1," and phi2=",phi2,sep = ""))
+x_acf2 <- acf(x, main=paste("AR(2) process phi1=",phi1," and phi2=",phi2,sep = ""))
+
+
+
 
 
 
