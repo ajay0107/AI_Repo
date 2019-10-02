@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1569995905491.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "7E4900A0",
+    "lastKnownWriteTime" : 23081356116951105,
+    "last_content_update" : 1569995905491,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "959CF285",
+        "caption" : "jj",
+        "contentUrl" : "grid_resource/gridviewer.html?env=package%3Aastsa&obj=jj&cache_key=959CF285",
+        "displayedObservations" : 84,
+        "environment" : "package:astsa",
+        "object" : "jj",
+        "preview" : 0,
+        "totalObservations" : 84,
+        "variables" : 1
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
