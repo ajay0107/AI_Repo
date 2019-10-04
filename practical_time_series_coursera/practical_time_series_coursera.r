@@ -103,13 +103,13 @@ x_acf <- acf(x,main="ACF of AR(1) process with white noise,phi=1")
 
 # simulating AR(2) process xt=zt+phi1*xt-1+phi2*xt-2
 set.seed(2017)
-phi1 <- 0.5
-phi2 <- -0.4
+phi1 <- 0.6
+phi2 <- -0.2
 x <- arima.sim(list(ar=c(phi1,phi2)),n=1000)
 par(mfrow=c(2,1))
 plot(x,main=paste("AR(2) process phi1=",phi1," and phi2=",phi2,sep = ""))
 x_acf2 <- acf(x, main=paste("AR(2) process phi1=",phi1," and phi2=",phi2,sep = ""))
-
+x_acf_partial <- acf(x, ,main=paste("PACF of AR(2) process phi1=",phi1," and phi2=",phi2,sep = ""))
 
 
 
