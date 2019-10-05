@@ -1,7 +1,16 @@
 # install.packages("faraway")
 # install.packages("astsa")
+# install.packages("tseries")
+# install.packages("isdals")
+# install.packages("ppcor")
+
+library(bev)
 library(faraway)
 library(astsa)
+library(isdals)
+library(ppcor)
+# bodyfat dataset
+
 
 data <- data(package = "faraway")
 data("coagulation", package="faraway")
@@ -104,12 +113,105 @@ x_acf <- acf(x,main="ACF of AR(1) process with white noise,phi=1")
 # simulating AR(2) process xt=zt+phi1*xt-1+phi2*xt-2
 set.seed(2017)
 phi1 <- 0.6
-phi2 <- -0.2
+phi2 <- 0.2
 x <- arima.sim(list(ar=c(phi1,phi2)),n=1000)
-par(mfrow=c(2,1))
+par(mfrow=c(3,1))
 plot(x,main=paste("AR(2) process phi1=",phi1," and phi2=",phi2,sep = ""))
 x_acf2 <- acf(x, main=paste("AR(2) process phi1=",phi1," and phi2=",phi2,sep = ""))
-x_acf_partial <- acf(x, ,main=paste("PACF of AR(2) process phi1=",phi1," and phi2=",phi2,sep = ""))
+x_acf_partial <- acf(x,type = "partial" ,main=paste("PACF of AR(2) process phi1=",phi1," and phi2=",phi2,sep = ""))
+
+# loading beveridge wheat prices index
+data(bev)
+plot(bev,ylab="price",main="Beveridge Wheat Price Data")
+beveridge_MA <- filter(bev,rep(1/31,31),sides = 2)
+lines(beveridge_MA,col="red")
+par(mfrow=c(3,1))
+y=bev/beveridge_MA
+plot(y,ylab="scaled price",main="Transformed Beveridge wheat price data")
+acf(na.omit(y),main="Autocorrelation function of Transformed Beveridge wheat price data")
+acf(na.omit(y),type = "partial",main="PACF of Transformed Beveridge wheat price data")
+
+# remember AR(p) has PACF that cuts after p lags 
+# ar() command automatically selects the order of AR process
+ar(na.omit(y),order.max = 6)
+data(bodyfat)
+head(bodyfat)
+pairs(bodyfat)
+attach(bodyfat)
+cor(Fat,Triceps)
+fat_hat <- predict(lm(Fat~Thigh))
+triceps_hat <- predict(lm(Triceps~Thigh))
+cor((Fat-fat_hat),(Triceps-triceps_hat))
+# calculating partial correlation using ppcor
+pcor(bodyfat)
+pcor(bodyfat[,!colnames(bodyfat) %in% c("Midarm")])
+# removing effects of Thigh, Midarm
+fat_hat1 <- predict(lm(Fat~Thigh+Midarm))
+triceps_hat1 <- predict(lm(Triceps~Thigh+Midarm))
+cor((Fat-fat_hat1),(Triceps- triceps_hat1))
+
+# Finding coefficients of AR models 
+# AR(2) model
+set.seed(2017)
+n <- 10000
+ar_process=arima.sim(n,model = list(ar=c(1/3,1/2)),sd=4)
+r <- acf(ar_process)
+rPartial <- acf(ar_process, type = "partial")
+R_matrix <- matrix(data=1,2,2)
+R_matrix[1,2] <- r$acf[2]
+R_matrix[2,1] <- r$acf[3]
+B <- matrix(data = c(r$acf[2],r$acf[3]),ncol = 1,nrow = 2)
+coeff <- solve(R_matrix,B)
+c0 <- acf(ar_process,type = "covariance")
+sdSquared<- c0$acf[1]*(1-r$acf[2]*coeff[1,1]-r$acf[3]*coeff[2,1])
+# AR(3) model
+set.seed(2017)
+n <- 10000
+ar_process=arima.sim(n,model = list(ar=c(1/3,1/2,7/100)),sd=4)
+r <- acf(ar_process)
+rPartial <- acf(ar_process, type = "partial")
+R=matrix(1,3,3) 
+R[1,2]=r$acf[1] 
+R[1,3]=r$acf[2]
+R[2,1]=r$acf[1]
+R[2,3]=r$acf[1]
+R[3,1]=r$acf[2]
+R[3,2]=r$acf[1]
+R
+# b-column vector on the right
+b=matrix(1,3,1)# b- column vector with no entries
+b[1,1]=r$acf[1]
+b[2,1]=r$acf[2]
+b[3,1]=r$acf[3]
+b
+coeff <- solve(R,b)
+c0 <- acf(ar_process,type = "covariance")
+sdSquared<- c0$acf[1]*(1-r$acf[2]*coeff[1,1]-r$acf[3]*coeff[2,1]-
+                         coeff[3,1]*r$acf[4])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

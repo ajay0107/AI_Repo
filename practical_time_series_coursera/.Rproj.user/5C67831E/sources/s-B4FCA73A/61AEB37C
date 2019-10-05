@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1570280025850.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "61AEB37C",
+    "lastKnownWriteTime" : 3419473789575321445,
+    "last_content_update" : 1570280025850,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "85D2D332",
+        "caption" : "bev",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=bev&cache_key=85D2D332",
+        "displayedObservations" : 370,
+        "environment" : "",
+        "object" : "bev",
+        "preview" : 0,
+        "totalObservations" : 370,
+        "variables" : 1
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
