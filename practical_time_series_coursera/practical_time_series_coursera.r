@@ -3,13 +3,16 @@
 # install.packages("tseries")
 # install.packages("isdals")
 # install.packages("ppcor")
+# install.packages("forecast")
 
 library(bev)
 library(faraway)
 library(astsa)
-library(isdals)
+library(isdals) # bodyfat dataset
 library(ppcor)
-# bodyfat dataset
+library(ggplot2)
+library(forecast) # auto.arima()
+
 
 
 data <- data(package = "faraway")
@@ -188,6 +191,166 @@ coeff <- solve(R,b)
 c0 <- acf(ar_process,type = "covariance")
 sdSquared<- c0$acf[1]*(1-r$acf[2]*coeff[1,1]-r$acf[3]*coeff[2,1]-
                          coeff[3,1]*r$acf[4])
+
+# fit AR(p) process to stationary time series data and find its parameters
+# Recruitment dataset
+myData <- rec
+# substracting mean to get time series with mean zero
+arProcess <- myData-mean(myData)
+# ACF and PACF of AR process
+par(mfrow=c(3,1))
+plot(myData, main="Recruitment time series",col="blue",lwd=3)
+acfmodel <- acf(arProcess, main="ACF recruitment", col="red", lwd=2)
+pacfModel <- acf(arProcess,type = "partial",main="PACF recruitment", col="green", lwd=2)
+acfmodel$acf
+# order
+p=2
+# ACFs 
+acfVec <- vector()
+acfVec[1:p] <- acfmodel$acf[2:(p+1)]
+# defining Matrix-R
+RMatrix <- matrix(1,p,p)
+for (i in 1:p) {
+  for (j in 1:p) {
+    if (i!=j) {
+      RMatrix[i,j] <- acfVec[abs(i-j)]
+    }
+  }
+}
+# b vector
+b <- vector()
+b <- matrix(acfVec,p,1)
+coeffNew <- solve(RMatrix,b)
+c0 <- acf(arProcess, type = "covariance")
+c0 <- c0$acf[1]
+varHat <- c0*(1-t(coeffNew) %*% matrix(data = acfVec,nrow = 2, ncol = 1))
+# getting constant term
+phi0Hat <- mean(myData)*(1-sum(coeffNew))
+
+# fit AR(p) process to Non-stationary time series data and find its parameters
+# Johnson & Johnson-model fitting
+data("JohnsonJohnson")
+plot(JohnsonJohnson, main ="johnson and johnson quarterly earnings",
+     col="blue",lwd=2)
+# mean is changing (increasing) and variance is changing
+# we can't fit a stationary AR model on this data, we have to transform this dataset
+# one such famous transformation is log return of time series, which makes it stationary time series
+logReturn <- diff(log(JohnsonJohnson))
+par(mfrow=c(3,1))
+plot(logReturn, main ="johnson and johnson dataset log return",
+     col="red",lwd=2)
+acfjohnson <- acf(logReturn,main="ACF johnson",col="green")
+pacfjohnson <- acf(logReturn, type = "partial",main="PACF johnson",
+                   col="magenta")
+# we will try to fit AR(4) model here
+arProcessJohnson <- logReturn-mean(logReturn)
+par(mfrow=c(2,1))
+acfjohnsonMeanZero <- acf(arProcessJohnson, main="ACF johnson mean zero",
+                          col="red",lwd=3)
+pacfjohnsonMeanZero <- acf(arProcessJohnson,type="partial",main="PACF johnson mean zero",
+                          col="green",lwd=3)
+p <- 4
+johnsonAcfs <- acfjohnsonMeanZero$acf[2:(p+1)]
+Rjohnson <- matrix(data = 1, nrow = p,ncol = p)
+for (i in 1:p) {
+  for (j in 1:p) {
+    if(i!=j){
+      Rjohnson[i,j] <- johnsonAcfs[abs(i-j)]  
+    }
+  }
+}
+
+bjohnson=matrix(johnsonAcfs,p,1)
+coeffJohnson <- solve(Rjohnson,bjohnson)
+# variance estimation
+c0 <- acf(arProcessJohnson,type = "covariance",plot = F)$acf[1]
+varjohnson <- c0*(1-sum(coeffJohnson*johnsonAcfs))
+# constant term
+phi0johnson <- mean(logReturn)*(1-sum(coeffJohnson))
+# we have equation with gives log return 
+
+
+# data simulation
+phi1 <- 0.7
+phi2 <- -0.2
+data <- arima.sim(list(ar=c(phi1,phi2)),n=2000)
+par(mfrow=c(2,1))
+acfSim <- acf(data, main="ACF of AR(2) process")
+pacfSim <- acf(data,type = "partial",main="ACF of AR(2) process")
+# using arima function to know coefficients of AR process
+arimaModel <- arima(data, order = c(2,0,0),include.mean = F)
+df <- as.data.frame(matrix(data = NA, nrow = 5000,ncol = 3))
+colnames(df) <- c("ar_order","aic","sse")
+for (p in 1:20) {
+  print(p)
+  arimaModel <- arima(data, order = c(p,0,0),include.mean = F)
+  df$ar_order[p] <- p
+  df$aic[p] <- arimaModel$aic
+  df$sse[p] <- sum(resid(arimaModel)^2)
+}
+
+View(df)
+par(mfrow=c(2,1))
+plot(x=df$ar_order, y=df$aic, col="red")
+plot(x=df$ar_order, y=df$sse, col="blue")
+
+# simluating data of ARMA(p,q)
+set.seed(500)
+phi1 <- 0.7
+phi2 <- 0.2
+dataArma <- arima.sim(list(order=c(1,0,1),ar=phi1,ma=phi2),n=1000000)
+par(mfcol=c(3,1))
+plot(data,main="ARMA(1,1)",xlim=c(0,400))
+acfArma <- acf(data,main="ACF of ARMA(1,1)")
+pacfArma <- acf(data,type = "partial",main="PACF of ARMA(1,1)")
+
+# estimate coefficients of ARMA models
+data("discoveries")
+plot(discoveries,main="Discoveries")
+stripchart(discoveries,method = "stack",offset = 0.5,at=0.15,
+           pch=19,main="Number of discoveries dotplot",
+           xlab="number of discoveries in year",
+           ylab="frequency")
+par(mfrow=c(2,1))
+acfdiscoveries <- acf(discoveries, main="acf discoveries", col="red", lwd=3)
+acfdiscoveries <- acf(discoveries,type = "partial",main="acf discoveries", col="blue", lwd=3)
+# difficult to tell the order of ARMA models by acf anf pacf plot 
+# we try several competing models and choose the best.. i.e. which has lowest AIC
+df <- as.data.frame(matrix(data = NA, nrow = 5000,ncol = 3))
+colnames(df) <- c("ar_order(p)","ma_order(q)","aic")
+count <- 1
+for (p in 0:3) {
+  for (q in 0:3) {
+    arimamodelDis <- arima(discoveries, order = c(p,0,q))
+    df$aic[count] <- arimamodelDis$aic
+    df$`ar_order(p)`[count] <- p
+    df$`ma_order(q)`[count] <- q
+    count <- count+1
+  }
+}
+View(df)
+# select the p,q for which we have lowest AIC
+# automatic function which gives best model
+auto.arima(discoveries,d=0,ic="bic",approximation = F)
+auto.arima(discoveries,d=0,ic="bic",approximation = T)
+auto.arima(discoveries,d=0,ic="aic",approximation = T)
+auto.arima(discoveries,d=0,ic="aic",approximation = F)
+
+# fitting ARIMA model
+data <- as.data.frame(readxl::read_xlsx(path = "female_births_california.xlsx"))
+plot(data$Date,data$`Daily total female births in California, 1959`, type = "l",
+     main = "female births california")
+
+
+
+
+
+
+
+
+
+
+
 
 
 
