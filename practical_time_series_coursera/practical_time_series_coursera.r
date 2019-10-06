@@ -338,8 +338,52 @@ auto.arima(discoveries,d=0,ic="aic",approximation = F)
 
 # fitting ARIMA model
 data <- as.data.frame(readxl::read_xlsx(path = "female_births_california.xlsx"))
+par(mfrow=c(2,1))
 plot(data$Date,data$`Daily total female births in California, 1959`, type = "l",
      main = "female births california")
+numBirths <- data$`Daily total female births in California, 1959`
+# test if autocorrelation exist for different lags 
+Box.test(numBirths,lag = log(length(numBirths)))
+# null hypothesis is that no auto correlation exist for any lag, 
+# as we see p-value <0.05 so there exist autocorrelation for any lag
+# we can see from plot that there exist trend in the time series so we take differencing 
+plot(x=data$Date[1:364],y=diff(numBirths),type = "l", 
+     main="female births after differencing")
+# again doing box.test 
+Box.test(diff(numBirths), lag = log(length(numBirths)))
+par(mfrow=c(2,1))
+acfBirth <- acf(diff(numBirths), main="acf of diff-births", col="red",lwd=2)
+pacfBirth <- acf(diff(numBirths),type = "partial",main="pacf of diff-births", 
+                 col="green",lwd=2)
+# fitting various ARIMA models 
+model1 <- arima(numBirths, order = c(0,1,1))
+SSE1 <- sum(model1$residuals^2)
+model1Test <- Box.test(model1$residuals, lag = log(length(model1$residuals)))
+
+model2 <- arima(numBirths, order = c(0,1,2))
+SSE2 <- sum(model2$residuals^2)
+model2Test <- Box.test(model2$residuals, lag = log(length(model2$residuals)))
+
+model3 <- arima(numBirths, order = c(7,1,1))
+SSE3 <- sum(model3$residuals^2)
+model3Test <- Box.test(model3$residuals, lag = log(length(model3$residuals)))
+
+model4 <- arima(numBirths, order = c(7,1,2))
+SSE4 <- sum(model4$residuals^2)
+model4Test <- Box.test(model4$residuals, lag = log(length(model4$residuals)))
+
+
+df<-data.frame(row.names=c('AIC', 'SSE', 'p-value'), c(model1$aic, SSE1, model1Test$p.value), 
+               c(model2$aic, SSE2, model2Test$p.value), c(model3$aic, SSE3, model3Test$p.value),
+               c(model4$aic, SSE4, model4Test$p.value))
+colnames(df)<-c('Arima(0,1,1)','Arima(0,1,2)', 'Arima(7,1,1)', 'Arima(7,1,2)')
+format(df,scientific=F)
+# here, we select model which has lowest AIC 
+# we select model = arima(0,1,2)
+sarima(numBirths,0,1,2,0,0,0)
+
+
+
 
 
 
