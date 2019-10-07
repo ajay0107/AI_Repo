@@ -382,16 +382,153 @@ format(df,scientific=F)
 # we select model = arima(0,1,2)
 sarima(numBirths,0,1,2,0,0,0)
 
+# steps to do SARIMA/ARIMA modelling- SARIMA(p,d,q,P,D,Q)
+# (1) time plot
+# (2) if variance changes with time, transform the data for example, take log of data
+# (3) if there is trend (seasonal/Non seasonal), then do differencing to remove trend- seasonal and non-seasonal differencing
+# (3') if there is both trend + variance change, then we can do log return = diff(log(ts))
+# (4) Do Ljung-Box Test- to check if there is an auto-correlation between lags
+# (5) ACF -> Adjacent spikes -> MA order
+# (6) ACF -> Spikes around seasonal lags -> SMA order
+# (7) PACF -> Adjacent spikes -> AR order
+# (8) PACF -> Spikes around seasonal lags -> SAR order
+# (9) Fit few different models
+# (10) Compare AIC, choose a model with minimum AIC
+# (11) The parsimony principle- p+d+q+P+D+Q <= 6
+# (12) Time plot, ACF and PACF of residuals
+# (13) Ljung-Box test for residuals - we expect white noise
+# (14) choose the model, which follows parsimony principle, along with lowest AIC
+
+plot(JohnsonJohnson,main="quarterly earnings johnson and johnson", col="red", lwd=2)
+jjLogreturn <- diff(log(JohnsonJohnson))
+
+# plot after log return
+par(mfrow=c(3,1))
+plot(jjLogreturn, main="log return quarterly earnings johnson and johnson", col="blue", lwd=1.5)
+acfjjLogreturn <- acf(jjLogreturn, main="ACF of log JJ log return", col="green", lwd=3)
+pacfjjLogreturn <- acf(jjLogreturn,type = "partial" ,main="PACF of log JJ log return", col="magenta", lwd=3)
+# taking seasonal differencing with lag=4
+par(mfrow=c(3,1))
+jjLogreturnSeasonalDiff <- diff(jjLogreturn,4)
+plot(jjLogreturnSeasonalDiff, main="seasonal diff quarterly earnings johnson and johnson", col="blue", lwd=1.5)
+acfjjLogreturn <- acf(jjLogreturnSeasonalDiff, main="ACF of log JJ log return", col="green", lwd=3)
+pacfjjLogreturn <- acf(jjLogreturnSeasonalDiff,type = "partial" ,main="PACF of log JJ log return", col="magenta", lwd=3)
+
+# LjungBox Test
+Box.test(jjLogreturnSeasonalDiff,lag = log(length(jjLogreturnSeasonalDiff)))
+# if p-value <0.05, we reject the null hypothesis that there is no auto-correlation between lags
+df <- as.data.frame(matrix(data = NA, ncol = 4, nrow = 1000000))
+colnames(df) <- c("parameters","aic","sse","pValue")
+count <- 1
+for (p in 0:3) {
+    for (q in 0:3) {
+      for (capP in 0:3) {
+          for (capQ in 0:3) {
+              if(p+1+q+capP+1+capQ <=7){
+              print(paste(p,1,q,capP,1,capQ,sep = "-"))
+              model <- arima(log(JohnsonJohnson),order = c(p,1,q),seasonal = list(order=c(capP,1,capQ),period=4))
+              df$parameters[count] <- paste(p,1,q,capP,1,capQ,sep = "-")
+              df$aic[count] <- model$aic
+              df$sse[count] <- sum(model$residuals^2)
+              boxTest <- Box.test(model$residuals,lag=log(length(model$residuals)))
+              df$pValue[count] <- boxTest$p.value
+              count <- count+1
+              print(count)
+              }
+            }
+            
+          }
+          
+        }
+        
+      }
+      
+# using SARIMA for fitting sarima model
+df <- as.data.frame(matrix(data = NA, ncol = 4, nrow = 1000000))
+colnames(df) <- c("parameters","aic","sse","pValue")
+count <- 1
+for (p in 0:3) {
+  for (q in 0:3) {
+    for (capP in 0:3) {
+      for (capQ in 0:3) {
+        if(p+1+q+capP+1+capQ <=7){
+          print(paste(p,1,q,capP,1,capQ,sep = "-"))
+          model <- sarima(log(JohnsonJohnson),p,1,q,capP,1,capQ,4)
+          df$parameters[count] <- paste(p,1,q,capP,1,capQ,sep = "-")
+          df$aic[count] <- model$fit$aic
+          df$sse[count] <- sum(model$fit$residuals^2)
+          boxTest <- Box.test(model$fit$residuals,lag=log(length(model$fit$residuals)))
+          df$pValue[count] <- boxTest$p.value
+          count <- count+1
+          print(count)
+        }
+      }
+      
+    }
+    
+  }
+  
+}
+
+# using auto.arima
+autoModelarima <- auto.arima(y=log(JohnsonJohnson),max.p = 2,max.q = 2, max.P = 2,max.Q = 2, max.order = 8, start.p = 0,start.q = 0,
+           start.P = 0,start.Q = 0,stationary = F,seasonal = TRUE,ic="aic",trace = T,max.d = 3,max.D = 3)
+plot(forecast(autoModelarima))
+forecast(autoModelarima)
+plot(forecast(model))
+forecast(model)
 
 
-
-
-
-
-
-
-
-
+# Monthly Milk production per cow dataset
+dataMilk <- as.data.frame(readxl::read_xlsx(path = "monthly_milk_production_per_cow.xlsx"))
+dataMilk$Month <- as.Date(paste(dataMilk$Month,"01",sep = "-"),"%Y-%m-%d")
+par(mfrow=c(3,1))
+plot(x=dataMilk$Month,y=dataMilk$Milk, main="monthly milk production per cow",col="red",lwd=1.5, type = "l")
+acfMilk <- acf(dataMilk$Milk,main="acf of milk data", col="blue",lwd=2,lag.max=50)
+pacfMilk <- acf(dataMilk$Milk,type = "partial",main="pacf of milk data", col="green",lwd=2,lag.max=50)
+# from figure, it suggest cyclic behaviour after 12 lags - seasonal differencing 12 lags
+# and there is also a trend, given by graph - non seasonal differencing 
+nonseasonaldiff <- diff(dataMilk$Milk)
+seasonaldiff <- diff(nonseasonaldiff,12)
+# no need to transform the data because variance is same 
+plot(seasonaldiff, main="with nonseasonal and season diff", col="red", lwd=1.5, type = "l")
+# now, our data becomes stationary- only stationary data can be fitted by models 
+acfMilk <- acf(seasonaldiff,main="acf of milk data with nonseasonal and season diff", col="blue",lwd=2,lag.max=50)
+pacfMilk <- acf(seasonaldiff,type = "partial",main="pacf of milk data with nonseasonal and season diff", col="green",lwd=2,lag.max=50)
+# we can see that acf and pacf are significant at lags = 12, 24, 36 etc after nonseasonal and season diff. So, there is seasonal AR and seasonal MA
+# from acf and pacf plot, we can get idea of parameters 
+# MA= q <- 0, Q=0,1,2,3
+# AR = p <- 0, P = 0,1,2,3
+df <- as.data.frame(matrix(data = NA, ncol = 4, nrow = 1000000))
+colnames(df) <- c("parameters","aic","sse","pValue")
+count <- 1
+d <- 0
+DD <- 0
+p <- 0
+q <- 0
+per <- 12
+    for (capP in 0:3) {
+      for (capQ in 0:3) {
+        if(p+d+q+capP+DD+capQ <=7){
+          print(paste(p,d,q,capP,DD,capQ,sep = "-"))
+          model <- arima(seasonaldiff,order = c(p,d,q),seasonal = list(order=c(capP,DD,capQ),period=per))
+          df$parameters[count] <- paste(p,d,q,capP,DD,capQ,sep = "-")
+          df$aic[count] <- model$aic
+          df$sse[count] <- sum(model$residuals^2)
+          boxTest <- Box.test(model$residuals,lag=log(length(model$residuals)))
+          df$pValue[count] <- boxTest$p.value
+          count <- count+1
+          print(count)
+        }
+      }
+      
+    }
+    
+# if you manual do.....seasonal and non seasonal differencing , then put d=0, D=0 in arima function. It gives same result
+ # now, forecasting
+model <- arima(dataMilk$Milk,order = c(0,1,0),seasonal = list(order=c(0,1,1),period=12))
+plot(forecast(model))  
+forecast(model)
 
 
 
