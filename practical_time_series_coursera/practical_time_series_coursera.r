@@ -12,6 +12,8 @@ library(isdals) # bodyfat dataset
 library(ppcor)
 library(ggplot2)
 library(forecast) # auto.arima()
+library(lubridate)
+library(dplyr)
 
 
 
@@ -530,10 +532,27 @@ model <- arima(dataMilk$Milk,order = c(0,1,0),seasonal = list(order=c(0,1,1),per
 plot(forecast(model))  
 forecast(model)
 
-
-
-
-
+# Airplane_Crashes_and_Fatalities_Since_1908 dataset
+GTemp <- read.csv("GlobalTemperatures.csv",stringsAsFactors = F, check.names = F)
+GTemp["month"] <- month(as.POSIXlt(GTemp$dt, format="%Y-%m-%d"))
+GTemp["year"] <- year(as.POSIXlt(GTemp$dt, format="%Y-%m-%d"))
+# GTemp <- GTemp[, c("yearCrash","monthCrash","Fatalities")]
+# GTemp <- as.data.frame(GTemp %>% group_by(yearCrash,monthCrash) %>% summarise(Fatalities=sum(Fatalities,na.rm = T)))
+# xx <- as.data.frame(GTemp %>% group_by(year) %>% summarise(months=sum(month,na.rm = T)))
+# taking data from 1960-1991 - only at these time data is uniformly present
+GTemp <- GTemp[GTemp$year %in% as.character(1753:2015),]
+GTemp["yearMonth"] <- c(1:length(GTemp$dt))
+timeVec <-GTemp$yearMonth
+landTemp <- GTemp$LandAverageTemperature
+plot(x=timeVec,y=landTemp, main="GTemp monthly", col="red", lwd=2, type = "l")
+# there is trend + seasonality in data
+# making data stationary
+logreturntemp <- diff(landTemp)
+par(mfrow=c(3,1))
+plot(x=timeVec[2:length(landTemp)],y=logreturntemp, main="GTemp monthly", col="red", lwd=2, type = "l")
+acfGTemp <- acf(logreturntemp, main= "ACF of GTemp monthly",col="blue", lwd=3 )
+pacfGTemp <- acf(logreturntemp,type = "partial",main= "PACF of GTemp monthly",col="green", lwd=3 )
+Box.test(fatalities,lag=log(length(landTemp)))
 
 
 
