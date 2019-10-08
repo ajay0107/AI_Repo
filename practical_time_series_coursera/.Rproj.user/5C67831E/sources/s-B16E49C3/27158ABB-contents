@@ -606,6 +606,8 @@ for (p in 0:2) {
   }
 }
 
+
+
 # auto.arima
 autoArimaModelTemp <- auto.arima(landTemp,d=1,D=1, max.p = 2, max.q = 2,max.P = 2,max.Q = 2,
            max.order = 7,stationary = F,seasonal = T,ic="aic",trace = T)
