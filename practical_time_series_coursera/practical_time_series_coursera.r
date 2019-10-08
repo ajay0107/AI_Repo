@@ -531,7 +531,18 @@ plot(forecast(model))
 forecast(model)
 
 
+# SARIMA fitting: Sales at a souvenir shop
+sales <-  as.data.frame(readxl::read_xlsx("sales.xlsx"))
+par(mfrow=c(3,1))
+plot(x=sales$Month, y= sales$Sales, main="plot sales vs time", col="blue", lwd=3, type = "l")
+acfSales <- acf(sales$Sales, main="acf of sales data", col="red",lwd=1.5)
+pacfSales <- acf(sales$Sales,type = "partial", main="pacf of sales data", col="blue",lwd=3)
 
+logReturnSales <- diff(log(sales$Sales))
+par(mfrow=c(3,1))
+plot(x=sales$Month[2:length(sales$Month)], y=logReturnSales, main="plot sales vs time - log return", col="blue", lwd=3, type = "l")
+acfSales <- acf(logReturnSales, main="acf of sales data-log return", col="red",lwd=3)
+pacfSales <- acf(logReturnSales,type = "partial", main="pacf of sales data- log return", col="blue",lwd=3)
 
 
 
