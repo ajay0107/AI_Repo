@@ -532,8 +532,6 @@ model <- arima(dataMilk$Milk,order = c(0,1,0),seasonal = list(order=c(0,1,1),per
 plot(forecast(model))  
 forecast(model)
 
-<<<<<<< HEAD
-
 # SARIMA fitting: Sales at a souvenir shop
 sales <-  as.data.frame(readxl::read_xlsx("sales.xlsx"))
 par(mfrow=c(3,1))

@@ -1,21 +1,21 @@
 {
     "collab_server" : "",
     "contents" : "",
-    "created" : 1570552227674.000,
+    "created" : 1570552681292.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3468598350",
-    "id" : "511A9527",
-    "lastKnownWriteTime" : 1570552491,
-    "last_content_update" : 1570552491626,
+    "hash" : "0",
+    "id" : "DAEB2AFF",
+    "lastKnownWriteTime" : 1570552717,
+    "last_content_update" : 1570552717470,
     "path" : "C:/Users/Ajay/Music/AI_Repo/practical_time_series_coursera/practical_time_series_coursera.r",
     "project_path" : "practical_time_series_coursera.r",
     "properties" : {
-        "cursorPosition" : "570,0",
-        "scrollLine" : "540"
+        "cursorPosition" : "547,24",
+        "scrollLine" : "525"
     },
-    "relative_order" : 4,
+    "relative_order" : 2,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "r_source"
