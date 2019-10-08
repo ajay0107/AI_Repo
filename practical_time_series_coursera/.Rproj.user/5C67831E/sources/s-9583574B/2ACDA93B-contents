@@ -561,12 +561,61 @@ plot(x=timeVec,y=landTemp, main="GTemp monthly", col="red", lwd=2, type = "l")
 # there is trend + seasonality in data
 # making data stationary
 logreturntemp <- diff(landTemp)
+seasonaldiffTemp <- ts(diff(logreturntemp,12))
 par(mfrow=c(3,1))
-plot(x=timeVec[2:length(landTemp)],y=logreturntemp, main="GTemp monthly", col="red", lwd=2, type = "l")
-acfGTemp <- acf(logreturntemp, main= "ACF of GTemp monthly",col="blue", lwd=3 )
-pacfGTemp <- acf(logreturntemp,type = "partial",main= "PACF of GTemp monthly",col="green", lwd=3 )
-Box.test(fatalities,lag=log(length(landTemp)))
+plot(seasonaldiffTemp, main="GTemp monthly", col="red", lwd=2, type = "l")
+acfGTemp <- acf(seasonaldiffTemp, main= "ACF of GTemp monthly",col="blue", lwd=3 , lag.max = 60)
+pacfGTemp <- acf(seasonaldiffTemp,type = "partial",main= "PACF of GTemp monthly",col="green", 
+                 lwd=3,lag.max = 60 )
+# plots shows following 
+# MA = 1
+# SMA=1 at lag = 12
+# AR=1
+# SAR = 1
+# d=1
+# DD=1
+Box.test(seasonaldiffTemp,lag=log(length(seasonaldiffTemp))) # we reject null hypothesis
 
+df <- as.data.frame(matrix(data = NA, ncol = 4, nrow = 1000000))
+colnames(df) <- c("parameters","aic","sse","pValue")
+count <- 1
+d <- 1
+DD <- 1
+p <- 1
+q <- 1
+capP <- 1
+capQ <- 1
+seasonalLag <- 12
+for (p in 0:2) {
+  for (q in 0:2) {
+    for (capP in 0:2) {
+      for (capQ in 0:2) {
+        if(p+d+q+capP+DD+capQ <=7){
+          print(paste(p,d,q,capP,DD,capQ,sep = "-"))
+          model <- arima(seasonaldiffTemp,order = c(p,d,q),seasonal = list(order=c(capP,DD,capQ),period=seasonalLag))
+          df$parameters[count] <- paste(p,d,q,capP,DD,capQ,sep = "-")
+          df$aic[count] <- model$aic
+          df$sse[count] <- sum(model$residuals^2)
+          boxTest <- Box.test(model$residuals,lag=log(length(model$residuals)))
+          df$pValue[count] <- boxTest$p.value
+          count <- count+1
+          print(count)
+        }
+      }
+    }  
+  }
+}
+
+# auto.arima
+autoArimaModelTemp <- auto.arima(landTemp,d=1,D=1, max.p = 2, max.q = 2,max.P = 2,max.Q = 2,
+           max.order = 7,stationary = F,seasonal = T,ic="aic",trace = T)
+
+forecastTemp <- forecast(autoArimaModelTemp)
+forecastTemp$model
+landTemp <- append(landTemp,forecastTemp$mean)
+forecastTemp$mean
+plot(ts(tail(landTemp,60)), main="forecast of temp",col="blue", lwd=1.5,type="l")
+plot(forecast(autoArimaModelTemp))
 
 
 
