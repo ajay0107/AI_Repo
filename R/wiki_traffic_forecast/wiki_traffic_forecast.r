@@ -20,6 +20,8 @@ library('forcats') # factor manipulation
 library('lubridate') # date and time
 library('forecast') # time series analysis
 library('prophet') # time series analysis
+library('lazyeval')
+
 # Multiple plot function
 #
 # ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
@@ -75,6 +77,17 @@ extract_ts <- function(rownr){
            views = as.integer(`1`)) %>%
     select(-`1`)
 }
+extract_ts_nrm <- function(rownr){
+  tdates %>%
+    filter_((interp(~x == row_number(), .values = list(x = rownr)))) %>%
+    rownames_to_column %>% 
+    gather(dates, value, -rowname) %>% 
+    spread(rowname, value) %>%
+    mutate(dates = ymd(dates),
+           views = as.integer(`1`)) %>%
+    select(-`1`) %>%
+    mutate(views = views/mean(views))
+}
 
 
 train <- fread("C:/Users/Galytix/Downloads/web-traffic-time-series-forecasting/train_1.csv",
@@ -105,14 +118,19 @@ mediawiki <- mediawiki %>% separate(Page, into = c("article", "bar"), sep = "_ww
 tpages <-  wikipedia %>% full_join(wikimedia, by=c("rowname","article","locale","access","agent")) %>% 
   full_join(mediawiki, by=c("rowname","article","locale","access","agent"))
 
-xx <- tdates %>% filter_((interp(~x == row_number(), .values = list(x = rownr))))
 
-p1 <- tpages %>% ggplot(aes(agent))+geom_bar(fill="red")
-p2 <- tpages %>% ggplot(aes(access))+geom_bar(fill="red")
-p3 <- tpages %>% ggplot(aes(locale, fill=locale))+geom_bar()+theme(legend.position = "none")
-layout <- matrix(c(1,2,3,3),2,2, byrow = T)
-multiplot(p1,p2,p3,layout = layout)
-extract_ts(rownr = 10)
+
+
+
+
+
+
+# p1 <- tpages %>% ggplot(aes(agent))+geom_bar(fill="red")
+# p2 <- tpages %>% ggplot(aes(access))+geom_bar(fill="red")
+# p3 <- tpages %>% ggplot(aes(locale, fill=locale))+geom_bar()+theme(legend.position = "none")
+# layout <- matrix(c(1,2,3,3),2,2, byrow = T)
+# multiplot(p1,p2,p3,layout = layout)
+# extract_ts(rownr = 10)
 
 
 
