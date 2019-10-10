@@ -67,28 +67,6 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
-extract_ts <- function(rownr){
-  tdates %>%
-    filter_((interp(~x == row_number(), .values = list(x = rownr)))) %>%
-    rownames_to_column %>% 
-    gather(dates, value, -rowname) %>% 
-    spread(rowname, value) %>%
-    mutate(dates = ymd(dates),
-           views = as.integer(`1`)) %>%
-    select(-`1`)
-}
-extract_ts_nrm <- function(rownr){
-  tdates %>%
-    filter_((interp(~x == row_number(), .values = list(x = rownr)))) %>%
-    rownames_to_column %>% 
-    gather(dates, value, -rowname) %>% 
-    spread(rowname, value) %>%
-    mutate(dates = ymd(dates),
-           views = as.integer(`1`)) %>%
-    select(-`1`) %>%
-    mutate(views = views/mean(views))
-}
-
 
 train <- fread("C:/Users/Galytix/Downloads/web-traffic-time-series-forecasting/train_1.csv",
               stringsAsFactors = F, check.names = F)
@@ -118,9 +96,51 @@ mediawiki <- mediawiki %>% separate(Page, into = c("article", "bar"), sep = "_ww
 tpages <-  wikipedia %>% full_join(wikimedia, by=c("rowname","article","locale","access","agent")) %>% 
   full_join(mediawiki, by=c("rowname","article","locale","access","agent"))
 
-
-
-
+extract_ts <- function(rownr){
+  dataTime <- tdates[rownr,]
+  outDf <- data.frame(dates=colnames(dataTime),views=as.numeric(df[1,]))
+  return(outDf)
+}
+extract_ts_nrm <- function(rownr){
+  dataTime <- tdates[rownr,]
+  outDf <- data.frame(dates=colnames(dataTime),views=as.numeric(df[1,]))
+  outDf <- outDf %>% mutate(views=views/mean(views))
+  return(outDf)
+}
+plot_rownr <- function(rownr){
+  art <- tpages[rownr,]$article
+  loc <- tpages[rownr,]$locale
+  acc <- tpages[rownr,]$access
+  extract_ts(rownr) %>% ggplot(aes(x=dates,y=views))+geom_line()+
+    geom_smooth(method = "loess", color="blue", span=1/5)+
+    labs(title = paste(art,"-",loc,"-",acc))
+}
+plot_rownr_log <- function(rownr){
+  art <- tpages[rownr,]$article
+  loc <- tpages[rownr,]$locale
+  acc <- tpages[rownr,]$access
+  extract_ts_nrm(rownr) %>% ggplot(aes(x=dates, y=views))+ geom_line()+
+    geom_smooth(method = "loess", color="red", span=1/5)+
+    labs(title = paste(art,"-",loc,"-",acc))+
+    scale_y_log10()+labs(y="log views")
+  
+}
+plot_rownr_zoom <- function(rownr,start,end){
+  art <- tpages[rownr,]$article
+  loc <- tpages[rownr,]$locale
+  acc <- tpages[rownr,]$access
+  data1 <- extract_ts(rownr)
+  data1 <- data1[data1$dates > ymd(start) & data1$dates <= ymd(end),]
+  data1 %>% ggplot(aes(x=dates, y=views))+ geom_line()+
+    geom_smooth(method = "loess", color="red", span=1/5)+
+    labs(title = paste(art,"-",loc,"-",acc))
+  
+}
+# plot_rownr(11214)
+plot_names <-  function(art, acc, agent){
+  
+  
+}
 
 
 
