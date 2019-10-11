@@ -138,8 +138,24 @@ plot_rownr_zoom <- function(rownr,start,end){
 }
 # plot_rownr(11214)
 plot_names <-  function(art, acc, agent){
-  
-  
+ vec <- tpages[tpages$article %in% art & tpages$access %in% acc & tpages$agent %in% agent,"rowname"]
+ selecttpages <- tpages[tpages$rowname %in% vec,]
+ td <- tdates[vec,] %>% rownames_to_column("rowname")
+ df <- merge(td,selecttpages,by="rowname")
+ df <- reshape2::melt(df,id.vars=c("rowname","article","locale","access","agent"))
+ df$locale <- as.factor(df$locale)
+ df$variable <- as.Date(as.character(df$variable),"%Y-%m-%d")
+ df %>% ggplot(aes(x=variable,y=value,color=locale))+geom_line()
+}
+plot_names_nrm <-  function(art, acc, agent){
+  vec <- tpages[tpages$article %in% art & tpages$access %in% acc & tpages$agent %in% agent,"rowname"]
+  selecttpages <- tpages[tpages$rowname %in% vec,]
+  td <- tdates[vec,] %>% rownames_to_column("rowname")
+  df <- merge(td,selecttpages,by="rowname")
+  df <- reshape2::melt(df,id.vars=c("rowname","article","locale","access","agent"))
+  df$locale <- as.factor(df$locale)
+  df$variable <- as.Date(as.character(df$variable),"%Y-%m-%d")
+  df %>% ggplot(aes(x=variable,y=value,color=locale))+geom_line()+scale_y_log10()
 }
 
 
