@@ -42,7 +42,7 @@ model = keras.Sequential([keras.layers.Flatten(input_shape=(28,28)),
                           ])   
 
 # Compiling the Neural Network
-model.compile(optimizer =   tf.train.AdamOptimizer(),
+model.compile(optimizer =   tf.optimizers.Adam(),
               loss= "sparse_categorical_crossentropy",
               metrics=["accuracy"])
 
