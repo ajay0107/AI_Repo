@@ -21,7 +21,6 @@ from six.moves import cPickle as pickle
 import platform
 #from subprocess import check_output
 import glob
-
 import tensorflow as tf
 import keras
 from keras.constraints import maxnorm
@@ -41,3 +40,48 @@ import torchvision.transforms as transforms
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+
+# =============================================================================
+# Set the GPU for use and check if it successful activate.
+# =============================================================================
+use_gpu = torch.cuda.is_available()
+use_gpu
+
+# opening and loading the file
+def unpickle(fname):
+    with open (fname, "rb") as f:
+        result = pickle.load(f, encoding = "bytes")
+    return result
+
+def getData():
+    labels_training = []
+    dataImgSet_training = []
+    labels_test = []
+    dataImg_test = []
+     # use "data_batch_*" for just the training set
+     
+for fname in glob.glob("Deep_learning/data/cifar-10-batches-py/*data_batch*"):
+  #  fname = 'Deep_learning/data/cifar-10-batches-py\\data_batch_1'
+    print("getting data from:",fname )
+    data = unpickle(fname)
+    for i in range(10000):
+        img_flat = data[b'data'][i]
+        labels_training.append(data[b'data'][2])
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
