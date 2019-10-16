@@ -201,7 +201,7 @@ dftemp <- merge(tpages,dftemp, by="rowname")
   return(dfStore)
 }
 
-# paramsLocalDf <- params_by_locale()
+paramsLocalDf <- params_by_locale()
 p1 <- paramsLocalDf %>% ggplot(aes(min_view))+
   geom_histogram(fill="red", bins = 50)+scale_x_log10()
 p2 <- paramsLocalDf %>% ggplot(aes(max_view))+
