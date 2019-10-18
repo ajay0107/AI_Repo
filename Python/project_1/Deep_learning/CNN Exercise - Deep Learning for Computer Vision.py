@@ -58,19 +58,56 @@ def getData():
     dataImgSet_training = []
     labels_test = []
     dataImg_test = []
-     # use "data_batch_*" for just the training set
-     
-for fname in glob.glob("Deep_learning/data/cifar-10-batches-py/*data_batch*"):
-  #  fname = 'Deep_learning/data/cifar-10-batches-py\\data_batch_1'
-    print("getting data from:",fname )
-    data = unpickle(fname)
-    for i in range(10000):
-        # i = 0
-        img_flat = data[b'data'][i]
-        labels_training.append(data[b'data'][i])
+    # use "data_batch_*" for just the training set
+    for fname in glob.glob("Deep_learning/data/cifar-10-batches-py/*data_batch*"):
+    #  fname = 'Deep_learning/data/cifar-10-batches-py\\data_batch_1'
+        print("getting data from:",fname )
+        data = unpickle(fname)
+        for i in range(10000):
+            # i = 1
+            img_flat = data[b'data'][i]
+            labels_training.append(data[b'labels'][i])
+            img_R = img_flat[0:1024].reshape(32,32)
+            img_G = img_flat[1024:2048].reshape(32,32)
+            img_B = img_flat[2048:3072].reshape(32,32)
+            imgFormat = np.array([img_R, img_G,img_B])
+            imgFormat = np.transpose(imgFormat,(1,2,0))
+            dataImgSet_training.append(imgFormat)
+        
+        
+    # use "test_batch_*" for just the test set
+    for fname in glob.glob("Deep_learning/data/cifar-10-batches-py/*test_batch*"):
+        #  fname = 'Deep_learning/data/cifar-10-batches-py\\test_batch'
+        print("Getting data from : " , fname)
+        data = unpickle(fname)
+        for i in range(10000):
+            # i = 0
+            img_flat = data[b"data"][i]
+            labels_test.append(data[b"labels"][i])
+            img_R = img_flat[0:1024].reshape(32,32)
+            img_G = img_flat[1024:2048].reshape(32,32)
+            img_B = img_flat[2048:3072].reshape(32,32)
+            imgFormat = np.array([img_R, img_G, img_B])
+            imgFormat = np.transpose(imgFormat, (1, 2, 0))
+            dataImg_test.append(imgFormat)
+        
+    dataImgSet_training = np.array(dataImgSet_training)
+    labels_training = np.array(labels_training)
+    dataImg_test =  np.array(dataImg_test)   
+    labels_test = np.array(labels_test)
+
+    return dataImgSet_training,labels_training,dataImg_test,labels_test
     
+# data loading
+X_train, y_train, X_test, y_test = getData()
+
+labelNamesBytes = unpickle("Deep_learning/data/cifar-10-batches-py/batches.meta")
+labelNames = []
+for name in labelNamesBytes[b'label_names']:
+    labelNames.append(name.decode("ascii"))
     
 
+    
 
 
 

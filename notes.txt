@@ -1,1 +1,1 @@
-1:50:12 - done
+https://www.kaggle.com/mgmarques/cnn-exercise-deep-learning-for-computer-vision
