@@ -1,1 +1,3 @@
 https://www.kaggle.com/mgmarques/cnn-exercise-deep-learning-for-computer-vision
+
+https://machinelearningmastery.com/how-to-configure-image-data-augmentation-when-training-deep-learning-neural-networks/

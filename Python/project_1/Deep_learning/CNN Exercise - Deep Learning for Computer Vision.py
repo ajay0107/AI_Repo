@@ -105,7 +105,38 @@ labelNamesBytes = unpickle("Deep_learning/data/cifar-10-batches-py/batches.meta"
 labelNames = []
 for name in labelNamesBytes[b'label_names']:
     labelNames.append(name.decode("ascii"))
+labelNames = np.array(labelNames)
+
+fig = plt.figure(figsize = (6,6))
+for i in range(0,9):
+    # i = 1
+    ax=fig.add_subplot(330+1+i)
+    plt.imshow(Image.fromarray(X_test[i]))
+    ax.set_title(labelNames[y_test[i]])
     
+# =============================================================================
+#  Using the raw values as input features might make models 
+#  biased toward features having high magnitude values. 
+#  It is still recommended to normalize and scale down the 
+#  features, in our case, the images has a maximum of 255 
+#  pixels, then it is sufficient divide the dataset by 
+#  255.0 to normalize the data.    
+# =============================================================================
+X_train = X_train.astype("float32")
+X_test = X_test.astype("float32")
+X_train =  X_train/255
+X_test = X_test/255
+
+
+# =============================================================================
+# Remember there are 10 classes to work with and hence we are dealing with a multi-class classification problem, 
+# then we need performs one hot encoding of the labels.
+# =============================================================================
+
+y_train =  to_categorical(y_train)
+y_test = to_categorical(y_test)
+
+
 
     
 
