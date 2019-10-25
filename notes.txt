@@ -1,3 +1,7 @@
 https://www.kaggle.com/mgmarques/cnn-exercise-deep-learning-for-computer-vision
 
 https://machinelearningmastery.com/how-to-configure-image-data-augmentation-when-training-deep-learning-neural-networks/
+
+https://www.soa.org/globalassets/assets/Files/resources/research-report/2018/applying-image-recognition.pdf
+http://ataspinar.com/2017/12/04/using-convolutional-neural-networks-to-detect-features-in-sattelite-images/
+https://www.themtank.org/a-year-in-computer-vision
