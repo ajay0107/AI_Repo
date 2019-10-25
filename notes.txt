@@ -3,3 +3,11 @@ https://www.kaggle.com/mgmarques/cnn-exercise-deep-learning-for-computer-vision
 https://machinelearningmastery.com/how-to-configure-image-data-augmentation-when-training-deep-learning-neural-networks/
 
 conda install -c conda-forge spacy
+
+https://www.soa.org/globalassets/assets/Files/resources/research-report/2018/applying-image-recognition.pdf
+http://ataspinar.com/2017/12/04/using-convolutional-neural-networks-to-detect-features-in-sattelite-images/
+https://www.themtank.org/a-year-in-computer-vision
+https://www.pyimagesearch.com/2017/07/10/using-tesseract-ocr-python/
+https://www.pyimagesearch.com/2018/09/17/opencv-ocr-and-text-recognition-with-tesseract/
+https://www.learnopencv.com/deep-learning-based-text-recognition-ocr-using-tesseract-and-opencv/
+
