@@ -11,3 +11,6 @@ https://www.pyimagesearch.com/2017/07/10/using-tesseract-ocr-python/
 https://www.pyimagesearch.com/2018/09/17/opencv-ocr-and-text-recognition-with-tesseract/
 https://www.learnopencv.com/deep-learning-based-text-recognition-ocr-using-tesseract-and-opencv/
 
+
+https://github.com/kavgan/nlp-in-practice/blob/master/word2vec/Word2Vec.ipynb
+https://www.kaggle.com/currie32/predicting-similarity-tfidfvectorizer-doc2vec
