@@ -14,3 +14,12 @@ https://www.learnopencv.com/deep-learning-based-text-recognition-ocr-using-tesse
 
 https://github.com/kavgan/nlp-in-practice/blob/master/word2vec/Word2Vec.ipynb
 https://www.kaggle.com/currie32/predicting-similarity-tfidfvectorizer-doc2vec
+
+(1) gensim kaggle code
+(2) ocr code 
+(3) time series + prophet R code
+(4) working of prophet
+(5) implement one more CNN image classification code by self
+(6) how I can assimilate these points 
+
+
