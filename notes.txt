@@ -22,4 +22,6 @@ https://www.kaggle.com/currie32/predicting-similarity-tfidfvectorizer-doc2vec
 (5) implement one more CNN image classification code by self
 (6) how I can assimilate these points 
 
+https://www.youtube.com/watch?v=zmfe2RaX-14
+
 
