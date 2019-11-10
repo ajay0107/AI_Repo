@@ -1,0 +1,11 @@
+library(tseries)
+dataoil=read.csv(file = "data/oilgspc.csv",stringsAsFactors = F, check.names = F)
+attach(dataoil)
+# implementing adf test
+modelDF <- adf.test(gspc)
+plot(gspc, type = "l")
+gspcdiff <- diff(gspc)
+plot(gspcdiff, type="l")
+modeldiff <- adf.test(gspcdiff)
+random <- rnorm(1000)
+modelr <- adf.test(random)
