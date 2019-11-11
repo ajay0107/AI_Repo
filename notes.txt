@@ -26,4 +26,4 @@ https://www.kaggle.com/currie32/predicting-similarity-tfidfvectorizer-doc2vec
 
 https://www.youtube.com/watch?v=zmfe2RaX-14
 
-
+https://www.youtube.com/watch?v=Z1VsHYcNXDI - word2vec
